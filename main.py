@@ -66,15 +66,20 @@ class NewPostHandler(Handler):
 
         if title and postbody:
             a = BlogPost(title = title, postbody = postbody)
-            a.put()
+            key = a.put()
 
-            self.redirect("/blog")
+            self.redirect("/blog/%s" % key.id())
         else:
             error = "We need both a title and some content for the post body!"
             self.render('newpost.html', title=title, postbody=postbody, error=error)
 
+class BaseHandler(Handler):
+    def get(self):
+        self.response.write("<a href='/blog'>blog</a>")
+
 
 app = webapp2.WSGIApplication([
+    ('/', BaseHandler),
     ('/blog', MainHandler),
     ('/blog/newpost', NewPostHandler),
     webapp2.Route('/blog/<id:\d+>', ViewPostHandler)
